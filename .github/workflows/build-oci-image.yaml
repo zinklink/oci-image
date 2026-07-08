@@ -42,5 +42,5 @@ jobs:
         with:
           name: oci-image
           path: /tmp/image.tar
-          retention-days: 7     # 可自行調整保留天數 (最多 90 天)
-          if-no-files-found: error
+          retention-days: 2     # 可自行調整保留天數 (最多 90 天)
+          if-no-files-found: errors
