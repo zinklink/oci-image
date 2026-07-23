@@ -8,42 +8,53 @@ name: OCI Image Build
 
 on:
   push:
-    paths:
-      - Dockerfile          # 只在 Dockerfile 被改動時觸發
+    branches:
+      - main
   pull_request:
-    paths:
-      - Dockerfile
+    branches:
+      - main
   workflow_dispatch:        # 手動觸發備用
 
 # ── 2️⃣ 工作內容 ────────────────────────────────────────
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest         # GitHub‑Hosted runner
+    runs-on: ubuntu-latest         # GitHub-Hosted runner
     steps:
       # ---------------------------------------------------
       # ① 取回原始碼
       # ---------------------------------------------------
       - name: Checkout repository
-        uses: actions/checkout@v5   # 已支援 Node 24
+        uses: actions/checkout@v5   # 已支援 Node 24
       # ---------------------------------------------------
-      # ② 設定 Buildx（支援多平台、快取等可選功能）
+      # ② 設定 Docker Buildx
       # ---------------------------------------------------
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       
-      - name: Build and push OCI image
+      # ---------------------------------------------------
+      # ③ 編譯並載入 OCI Image 到 Runner 本地 Docker daemon
+      # ---------------------------------------------------
+      - name: Build OCI image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
-          load: true
-          tags: my-app:test
-      - name: save image to tar file
-        run: docker save -o my-app.tar my-app:ci-build
+          load: true                # 載入到 runner 的本地 Docker 引擎中
+          tags: my-app:latest
+      
+      # ---------------------------------------------------
+      # ④ 將 Image 匯出為 tar 封裝檔
+      # ---------------------------------------------------
+      - name: Save image to tar file
+        run: docker save -o my-app.tar my-app:latest
 
+      # ---------------------------------------------------
+      # ⑤ 上傳為 Actions Artifacts 供手動下載
+      # ---------------------------------------------------
       - name: Upload artifact (download later)
         uses: actions/upload-artifact@v4
         with:
           name: built-image
           path: my-app.tar
+          retention-days: 5         # 保留 5 天，避免佔用過多 GitHub 空間
