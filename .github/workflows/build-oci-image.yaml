@@ -1,60 +1,13 @@
-name: OCI Image Build
-
-    # ── 1️⃣ 觸發條件 ────────────────────────────────────────
-    #   - 任何分支的 push，只要檔案路徑符合 Dockerfile
-    #   - PR 合併（或更新）時也會觸發，確保 PR 內的 Dockerfile 變更不會被遺漏
-    #   - 手動觸發 (workflow_dispatch) 為備用
-
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:        # 手動觸發備用
-
-# ── 2️⃣ 工作內容 ────────────────────────────────────────
+on: push
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest         # GitHub-Hosted runner
+  job1:
+    runs-on: ubuntu-latest
     steps:
-      # ---------------------------------------------------
-      # ① 取回原始碼
-      # ---------------------------------------------------
-      - name: Checkout repository
-        uses: actions/checkout@v5   # 已支援 Node 24
-      # ---------------------------------------------------
-      # ② 設定 Docker Buildx
-      # ---------------------------------------------------
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-      
-      # ---------------------------------------------------
-      # ③ 編譯並載入 OCI Image 到 Runner 本地 Docker daemon
-      # ---------------------------------------------------
-      - name: Build OCI image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile
-          load: true                # 載入到 runner 的本地 Docker 引擎中
-          tags: my-app:latest
-      
-      # ---------------------------------------------------
-      # ④ 將 Image 匯出為 tar 封裝檔
-      # ---------------------------------------------------
-      - name: Save image to tar file
-        run: docker save -o my-app.tar my-app:latest
-
-      # ---------------------------------------------------
-      # ⑤ 上傳為 Actions Artifacts 供手動下載
-      # ---------------------------------------------------
-      - name: Upload artifact (download later)
-        uses: actions/upload-artifact@v4
-        with:
-          name: built-image
-          path: my-app.tar
-          retention-days: 5         # 保留 5 天，避免佔用過多 GitHub 空間
+    - run: pwd
+    - run: ls
+    - run: date
+  job2:
+    runs-on: windows-latest
+    steps:
+    - run: node --version
