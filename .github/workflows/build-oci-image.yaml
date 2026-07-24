@@ -2,12 +2,19 @@ on: push
 
 jobs:
   job1:
+    name: 使用ubuntu環境
     runs-on: ubuntu-latest
+
     steps:
-    - run: pwd
-    - run: ls
-    - run: date
-  job2:
-    runs-on: windows-latest
-    steps:
-    - run: node --version
+    - name: 查當前目錄
+      run: pwd
+
+    - name: 查看目錄下內容
+      run: ls
+
+    - name: 查看日期時間
+      run: date
+
+    - name: 引用node.js環境
+      uses: actions/checkout@v5
+
