@@ -20,7 +20,7 @@ jobs:
         docker save prometheus-random-example:0728 -o prometheus-random-example.tar
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: oci-image
         path: prometheus-random-example.tar
