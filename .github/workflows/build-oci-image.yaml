@@ -1,20 +1,26 @@
-on: push
+name: Build OCI Image
+
+on:
+  push:
 
 jobs:
-  job1:
-    name: 使用ubuntu環境
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: 查當前目錄
-      run: pwd
+    - name: Checkout source
+      uses: actions/checkout@v4
+    
+    - name: Build Image
+      run: |
+        docker build -t prometheus-random-example:0728 .
+    
+    - name: Save image
+      run: |
+        docker save prometheus-random-example:0728 -o prometheus-random-example.tar
 
-    - name: 查看目錄下內容
-      run: ls
-
-    - name: 查看日期時間
-      run: date
-
-    - name: 引用node.js環境
-      uses: actions/checkout@v5
-
+    - name: Upload artifact
+      use: actions/upload-artifact@v4
+      with:
+        name: oci-image
+        path: prometheus-random-example.tar
